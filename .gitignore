@@ -1,6 +1,9 @@
+.vscode/
 Task_0/build/*
+Task_1/build/*
 Task_2/build/*
 Task_0/.vscode/
 Task_2/.vscode/
 !Task_0/build/*Task_0.exe
+!Task_1/build/*Task_1.exe
 !Task_2/build/*Task_2.exe
