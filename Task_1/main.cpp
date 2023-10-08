@@ -5,18 +5,18 @@
 int main()
 {
     std::cout << "Beginning of program... " << std::endl;
-
-    MyVector<int> V1(10);
+    
+    MyVector<int> V1(1,0);
     MyVector<double> V2;
     MyVector<char> V3;
     char a = 11, b = 22, c = 33;
     int type;
 
-    for(int i = 0; i <= 9; i++)
+    for(int i = 1; i <= 9; i++)
     {
         V1.push_back(i);
     }
-    
+
     V2.push_back(2.5);
     V2.push_back(3.14);
     V2.push_back(56.325);
@@ -38,8 +38,8 @@ int main()
     std::cout << "Length of vector : "  << V1.length()  << std::endl << std::endl;
 
     std::cout << "Insert new values..." << std::endl << std::endl;
-    V1.insert(4,40);
-    V1.insert(7,70);
+    V1.insert(2,40);
+    V1.insert(4,60);
     std::cout << "Int vector : " << V1 << std::endl;
     std::cout << "Length of vector : "  << V1.length()  << std::endl << std::endl;
 

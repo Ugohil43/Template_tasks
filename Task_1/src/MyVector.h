@@ -11,19 +11,19 @@ private:
     T *arr;             
 public:
     MyVector();
-    MyVector(const std::size_t size);
+    MyVector(const std::size_t size, const T& value);
     ~MyVector();
 
-    void push_back(const T& value);
-    void pop_back();
-    void insert(const std::size_t& index, const T& value);
-    void reserve(const std::size_t& size);
+    void push_back(const T& value);                         // добавить элемент в конец вектора
+    void pop_back();                                        // удалить элемент с конеца вектора
+    void insert(const std::size_t& index, const T& value);  // вставка значения по индексу 
+    //void reserve(const std::size_t& size);
 
     inline std::size_t length() const;
 
-    T& operator[](const std::size_t& index) const;
-    MyVector<T> operator=(const MyVector<T>& v);
-    MyVector<T> operator=(MyVector<T>&& v);
+    T& operator[](const std::size_t& index) const;          // перегрузка оператора индексирвоания
+    MyVector<T> operator=(const MyVector<T>& v);            // перегрузка оператора присваивания   
+    MyVector<T> operator=(MyVector<T>&& v);                 // перегрузка оператора присваивания с помощью универсальной ссылки
 
     template<typename T1>
     friend std::ostream& operator<<(std::ostream& out, const MyVector<T1>& v);
@@ -33,16 +33,24 @@ template <typename T>
 inline MyVector<T>::MyVector()
 {
     this->size = 0;
-    this->count = 0;
-    arr = new T[size];
+    this->count = 1;
+    arr = new T[1];
+     for (std::size_t i = 0; i < size; i++) 
+    {
+      this->arr[i] = NULL;     // заполняем
+    }
 }
 
 template <typename T>
-inline MyVector<T>::MyVector(const std::size_t size)
+inline MyVector<T>::MyVector(const std::size_t size, const T& value)
 {
     this->size = size;
-    this->count = 0;
-    arr = new T[size];
+    this->count = size;
+    arr = new T[size];          // выделяем память
+    for (std::size_t i = 0; i < size; i++) 
+    {
+      this->arr[i] = value;     // заполняем
+    }
 }
 
 template <typename T>
@@ -55,26 +63,42 @@ inline MyVector<T>::~MyVector()
 template <typename T>
 inline void MyVector<T>::push_back(const T& value)
 {
+    /*
     if(count == size)
     {
         reserve(size);
     }
     arr[count++] = value;
+    */
+    if (this->size == this->count)          // если массив заполнен
+    {        
+      this->count *= 2;                     // увеличиваем его в 2 раза
+      T* new_arr = new T[this->count];      // создаем новый массив
+      for (std::size_t i = 0; i < this->size; i++) 
+      {
+        new_arr[i] = this->arr[i];          // копируем данные
+      }
+      delete[] this->arr;                   // удаляем старый массив
+      this->arr = new_arr;                  // меняем указатель
+    }
+    this->arr[this->size] = value;          // добавляем элемент
+    this->size++;                           // увеличиваем размер
 }
 
 template <typename T>
 inline void MyVector<T>::pop_back()
 {
-    if(!count)
+    if(!this->size)
     {
         return; 
     }
-    count--;
+    this->size--;
 }
 
 template <typename T>
 inline void MyVector<T>::insert(const std::size_t& index, const T& value)
 {
+    /*
     if(index >= count || index < 0)
     {
         throw "Incorrect index!";
@@ -82,7 +106,8 @@ inline void MyVector<T>::insert(const std::size_t& index, const T& value)
     
     if(count == size)
     {
-        reserve(size);
+        //reserve(size);
+        size*2;
     }
     
     for(std::size_t i = count - 1; i >= index; i--)
@@ -92,8 +117,31 @@ inline void MyVector<T>::insert(const std::size_t& index, const T& value)
 
     arr[index] = value;
     count++;
+    */
+    if (index >= this->size)                             // если индекс больше размера массива
+    {                              
+      throw std::out_of_range("Incorrect index!");      // бросаем исключение
+    }
+    if (this->size == this->count)                      // если массив заполнен
+    {  
+      this->count *= 2;                                 // увеличиваем его в 2 раза
+      T* new_arr = new T[this->count];                  // создаем новый массив
+      for (std::size_t j = 0; j < this->size; j++) 
+      {
+        new_arr[j] = this->arr[j];                       // копируем данные
+      }
+      delete[] this->arr;                               // удаляем старый массив
+      this->arr = new_arr;                              // меняем указатель
+    }
+    for (std::size_t j = this->size; j > index; j--) 
+    {
+      this->arr[j] = this->arr[j - 1];                  // сдвигаем элементы
+    }
+    this->arr[index] = value;                            // вставляем элемент
+    this->size++;                                       // увеличиваем размер массива
 }
 
+/*
 template <typename T>
 inline void MyVector<T>::reserve(const std::size_t& size)
 {
@@ -101,20 +149,23 @@ inline void MyVector<T>::reserve(const std::size_t& size)
     {
         return;
     }
-    
-    this->size = size;
+    std::cout << "Size: " << this->size << std::endl;
+    this->size = size*2;
+    std::cout << "Size: " << this->size << std::endl;
+    std::cout << "sizeof(T): " << sizeof(T) << std::endl;
     T *new_arr = new T[size];
-    
+    std::cout << "sizeof(T): " << sizeof(T) << std::endl;
     memmove(new_arr, arr, sizeof(T) * count);
     
     delete arr;
     arr = new_arr;
 }
+*/
 
 template <typename T>
 inline std::size_t MyVector<T>::length() const
 {
-     return count;
+     return size;
 }
 
 template <typename T>
@@ -125,13 +176,13 @@ inline T &MyVector<T>::operator[](const std::size_t& index) const
         throw "Index out of range!";
     }
     
-    return arr[index];
+    return this->arr[index];
 }
 
 template <typename T>
 inline MyVector<T> MyVector<T>::operator=(const MyVector<T>& v)
 {
-    if(this == &v)
+    if(this == &v)          // проверка на самокопирование
     {
         return *this;
     }
@@ -148,8 +199,8 @@ inline MyVector<T> MyVector<T>::operator=(const MyVector<T>& v)
 
 template <typename T>
 inline MyVector<T> MyVector<T>::operator=(MyVector<T>&& v)
-{
-    if(this == &v)
+{   
+    if(this == &v)          // проверка на самокопирование
     {
         return *this;
     }
@@ -164,9 +215,9 @@ inline MyVector<T> MyVector<T>::operator=(MyVector<T>&& v)
 }
 
 template <typename T1>
-inline std::ostream &operator<<(std::ostream &out, const MyVector<T1> &v)
+inline std::ostream &operator<<(std::ostream& out, const MyVector<T1>& v)
 {
-    for(std::size_t i = 0; i < v.length(); i++)
+    for(std::size_t i = 0; i < v.size; i++)
     {
         out << v[i] << " ";
     }
